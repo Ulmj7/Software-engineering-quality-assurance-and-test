@@ -6,7 +6,7 @@ public class GradeCalculator {
     // score нь 0-100 хязгаараас гарвал IllegalArgumentException шиднэ
     public String letterGrade(double score) {
         requireInRange("score", score, 100);
-        if (score > 90) return "A";
+        if (score >= 90) return "A";
         if (score >= 80) return "B";
         if (score >= 70) return "C";
         if (score >= 60) return "D";

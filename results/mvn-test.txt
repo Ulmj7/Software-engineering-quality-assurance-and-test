@@ -10,7 +10,8 @@
 [INFO] skip non existing resourceDirectory /mnt/c/Users/ulmjg/SyncNEO/SWE_testandquality/Lab4/lab04-junit/src/main/resources
 [INFO] 
 [INFO] --- compiler:3.8.0:compile (default-compile) @ lab04-junit ---
-[INFO] Nothing to compile - all classes are up to date
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 1 source file to /mnt/c/Users/ulmjg/SyncNEO/SWE_testandquality/Lab4/lab04-junit/target/classes
 [INFO] 
 [INFO] --- resources:3.0.2:testResources (default-testResources) @ lab04-junit ---
 [INFO] Using 'UTF-8' encoding to copy filtered resources.
@@ -26,7 +27,7 @@
 [INFO]  T E S T S
 [INFO] -------------------------------------------------------
 [INFO] Running mn.edu.must.sqat.GradeCalculatorTest
-[INFO] Tests run: 47, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.278 s -- in mn.edu.must.sqat.GradeCalculatorTest
+[INFO] Tests run: 47, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.277 s -- in mn.edu.must.sqat.GradeCalculatorTest
 [INFO] 
 [INFO] Results:
 [INFO] 
@@ -35,6 +36,6 @@
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  2.487 s
-[INFO] Finished at: 2026-09-29T22:42:59+08:00
+[INFO] Total time:  3.165 s
+[INFO] Finished at: 2026-09-29T22:43:57+08:00
 [INFO] ------------------------------------------------------------------------
