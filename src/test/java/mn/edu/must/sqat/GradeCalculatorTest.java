@@ -7,6 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 @DisplayName("GradeCalculator нэгжийн тестүүд")
 class GradeCalculatorTest {
@@ -156,6 +159,67 @@ class GradeCalculatorTest {
         GradeCalculator calc = new GradeCalculator();
         // Act
         Executable act = () -> calc.totalScore(10, 41, 10, 10, 30);
+        // Assert
+        assertThrows(IllegalArgumentException.class, act);
+    }
+
+    // ---------- Parameterized тестүүд ----------
+
+    @ParameterizedTest(name = "{0} оноо → {1}")
+    @DisplayName("letterGrade: ердийн болон хязгаарын оноо бүр зөв дүнтэй харгалзах ёстой")
+    @CsvSource({
+            "100,A", "95,A", "90,A",
+            "89.99,B", "85,B", "80,B",
+            "79.99,C", "75,C", "70,C",
+            "69.99,D", "65,D", "60,D",
+            "59.99,F", "30,F", "0,F"})
+    void letterGradeBoundaries(double score, String expected) {
+        // Arrange
+        GradeCalculator calc = new GradeCalculator();
+        // Act
+        String grade = calc.letterGrade(score);
+        // Assert
+        assertEquals(expected, grade);
+    }
+
+    @ParameterizedTest(name = "{0} оноо татгалзагдана")
+    @DisplayName("letterGrade: 0-100-аас гадуурх (NaN, Infinity орно) оноо бүр IllegalArgumentException шидэх ёстой")
+    @ValueSource(doubles = {-1, -0.01, 100.01, 101, Double.NaN, Double.POSITIVE_INFINITY})
+    void letterGradeRejectsInvalidScores(double score) {
+        // Arrange
+        GradeCalculator calc = new GradeCalculator();
+        // Act
+        Executable act = () -> calc.letterGrade(score);
+        // Assert
+        assertThrows(IllegalArgumentException.class, act);
+    }
+
+    @ParameterizedTest(name = "{0}+{1}+{2}+{3}+{4} = {5}")
+    @DisplayName("totalScore: хязгаар доторх хэсгүүдийн нийлбэр зөв гарах ёстой")
+    @CsvSource({
+            "10,40,10,10,30,100",
+            "0,0,0,0,0,0",
+            "5,20,5,5,15,50",
+            "9,35.5,8,7.5,25,85"})
+    void totalScoreSumsValidParts(double att, double lab, double quiz1, double quiz2, double exam, double expected) {
+        // Arrange
+        GradeCalculator calc = new GradeCalculator();
+        // Act
+        double total = calc.totalScore(att, lab, quiz1, quiz2, exam);
+        // Assert
+        assertEquals(expected, total, 1e-9);
+    }
+
+    @ParameterizedTest(name = "totalScore({0}, {1}, {2}, {3}, {4}) татгалзагдана")
+    @DisplayName("totalScore: аль нэг хэсэг сөрөг эсвэл дээд хязгаараасаа хэтэрвэл IllegalArgumentException шидэх ёстой")
+    @CsvSource({
+            "-5,0,0,0,0", "0,-1,0,0,0", "0,0,-1,0,0", "0,0,0,-1,0", "0,0,0,0,-1",
+            "10.01,0,0,0,0", "0,40.01,0,0,0", "0,0,10.01,0,0", "0,0,0,10.01,0", "0,0,0,0,30.01"})
+    void totalScoreRejectsAnyPartOutOfRange(double att, double lab, double quiz1, double quiz2, double exam) {
+        // Arrange
+        GradeCalculator calc = new GradeCalculator();
+        // Act
+        Executable act = () -> calc.totalScore(att, lab, quiz1, quiz2, exam);
         // Assert
         assertThrows(IllegalArgumentException.class, act);
     }
