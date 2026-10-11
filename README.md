@@ -84,3 +84,60 @@ S01 өөрийн setup-аар `PUT /students/B231234567` хүсэлтэд `{"sta
 ## Даалгавар 3 — Collection ба бие даасан байдал
 
 `lab05-collection.json` файлыг Postman-ийн Import хэсгээр оруулж ажиллуулж болно. Хавтас бүр өөрийн setup-аа агуулна; бусад хавтасны өгөгдөлд найдахгүй. PUT нь өмнөх бичлэгийг бүхэлд нь дахин бичнэ, харин байхгүй оюутан/хичээлийн ID нь ажиллуулах бүрд шинэ UUID байна. `registrationID` серверийн хугацаанд хуримтлагдах тул амжилтын oracle зөвхөн тоон төрөл эсэхийг шалгана. Collection-ийг серверийг дахин асаалгүй ажиллуулсны дараа хавтас бүрийг урвуу дарааллаар дангаар ажиллуулж, бүгд амжилттай болсноор бие даасан байдлыг шалгасан.
+
+## Даалгавар 4 — Newman-ийн бүтэн текст нотолгоо
+
+Үндсэн collection-ийн **тест/assertion-ы нийт тоо 75** бөгөөд энэ нь [results/newman-pass.txt](results/newman-pass.txt)-ийн `assertions` мөрийн `executed` тоотой яг таарна. Спецификацийн 13 сценарийг setup-тай нь ажиллуулахад 36 HTTP хүсэлт илгээнэ. PUT setup бүрийн статус ба result oracle мөн Newman-ийн assertions тоонд ордог.
+
+| Ажиллуулалт / бүтэн гаралт | Iterations executed / failed | Requests executed / failed | Assertions executed / failed | Newman exit code |
+| --- | --- | --- | --- | --- |
+| [PASS](results/newman-pass.txt) | 1 / 0 | 36 / 0 | 75 / 0 | 0 |
+| [FAIL](results/newman-fail.txt) | 1 / 0 | 36 / 0 | 75 / 1 | 1 |
+| [DOWN](results/newman-down.txt) | 1 / 0 | 36 / 36 | 75 / 75 | 1 |
+
+FAIL-д `lab05-collection-fail.json` гэсэн тусдаа collection ашигласан: зөвхөн S01 POST-ийн статусын oracle-д бодит `201`-ийн оронд `200` хүлээлгэсэн. `result="OK"` oracle болон үндсэн `lab05-collection.json` зөв хэвээр. Гаралт дахь `expected response to have status code 200 but got 201` нь зориудын oracle алдаа, харин exit code 1 нь CI quality gate тухайн ажиллуулалтыг зогсоох нөхцөл болно.
+
+DOWN-д API серверийг Ctrl+C-ээр унтраасны дараа үндсэн collection-ийг ажиллуулсан. `connect ECONNREFUSED 127.0.0.1:3000` нь сервертэй холбогдож чадаагүй интерфейсийн алдаа бөгөөд FAIL-ийн HTTP хариуг буруу хүлээсэн oracle алдаанаас ялгаатай. DOWN үед HTTP хариу байхгүйгээс статус, JSON oracle-ууд давхар унадаг; үндсэн шалтгаан нь холболтгүй байдал.
+
+Бүх гаралт бүтнээрээ UTF-8 текстээр хадгалагдсан; файлын төгсгөлийн `exit=...` нь ажиллуулалтын дараа `$LASTEXITCODE`-оос авсан Newman-ийн exit code. Node 24 дээр Newman-ы dependency-ээс гарсан `DEP0176` анхааруулга ч бүтэн гаралтад хадгалагдсан.
+
+### Давтан ажиллуулах (PowerShell)
+
+Эхний терминал:
+
+```powershell
+npm.cmd ci
+node server.js
+```
+
+Өөр терминалд дараах функцийг тодорхойлно. `cmd.exe` нь stderr-ийг stdout-д нэгтгэнэ; `$LASTEXITCODE`-г pipeline-ийн дараа шууд авна. `Tee-Object`-ийн файлыг дараа нь UTF-8 болгон хадгална.
+
+```powershell
+New-Item -ItemType Directory -Force -Path results | Out-Null
+function Save-NewmanRun($collection, $report) {
+    cmd.exe /d /c ".\node_modules\.bin\newman.cmd run $collection --color off 2>&1" |
+        Tee-Object -FilePath $report
+    $newmanExit = $LASTEXITCODE
+    $fullOutput = Get-Content -LiteralPath $report -Raw
+    [System.IO.File]::WriteAllText(
+        (Join-Path (Get-Location) $report),
+        $fullOutput + "`nexit=$newmanExit`n",
+        [System.Text.UTF8Encoding]::new($false)
+    )
+    Write-Output "Newman exit=$newmanExit"
+}
+Save-NewmanRun lab05-collection.json results/newman-pass.txt
+Save-NewmanRun lab05-collection-fail.json results/newman-fail.txt
+```
+
+Эхний терминал дахь серверийг **Ctrl+C**-ээр унтраагаад:
+
+```powershell
+Save-NewmanRun lab05-collection.json results/newman-down.txt
+```
+
+Серверийг дараа нь `node server.js`-ээр дахин асааж болно. Нотолгоог шинэчилбэл дээрх хүснэгтийн тоонууд, exit code-ийг шинэ гаралттай тулгаж шинэчилнэ.
+
+## Дүгнэлт
+
+Тест дизайны таван алхмаас сонголтуудыг эквивалент ангид хувааж, зөв хослолын спецификаци болгох үе хамгийн их бодол шаардсан. Оюутан байхгүй мөртөө түүний үзсэн хичээлүүдийг бодит өгөгдөлтэй гэж үзэх, эсвэл хичээл байхгүй мөртөө урьдачийг нь шалгах хослол боломжгүй байв. Ийм хамааралтай сонголтуудыг N/A гэж тэмдэглэснээр зөрчилтэй тест дизайн үүсгэхээс зайлсхийсэн. Давхар алдааны туршилтууд оюутан байхгүй алдаа хичээл байхгүй алдаанаас, идэвхгүй оюутны алдаа мөн хичээл байхгүй алдаанаас түрүүлдгийг баталсан. Урьдачгүй хичээлд хоосон coursesTaken зөвшөөрөгдөх боловч урьдачтай хичээлд алдаа болохыг хязгаарын кейсүүд харуулсан. Өөрийн PUT setup, шинэ UUID болон registrationID-ийн төрлийг шалгах oracle нь серверийн хуримтлагдсан төлөвөөс тестүүдийг хараат бус болгосон. Шалгасан спецификацийн хүрээнд API-гийн хариу хүлээлттэй таарсан тул бүтээгдэхүүний согог илрээгүй. Зориуд буруу oracle оруулахад Newman-ийн exit code алдааг илэрхийлж, автомат чанарын хаалт хийх боломжийг баталлаа. Сервер унтарсан үеийн ECONNREFUSED-ийг oracle-ийн алдаанаас ялгаж тайлбарлах нь доголдлын үндсэн шалтгааныг зөв тогтооход хэрэгтэй байв.

@@ -1,0 +1,1546 @@
+{
+  "info": {
+    "name": "Lab05 — API систем тест: хичээлд бүртгүүлэх — ЗОРИУДЫН FAIL",
+    "description": "F.CSA313. Бие даасан setup + POST + oracle. {{baseUrl}} collection variable. Newman 6-д нийцэх Postman Collection v2.1. S01 POST-ийн статусын нэг oracle зориуд HTTP 200 хүлээнэ; бодит хариу 201.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "S01 — Идэвхтэй оюутан урьдач нөхцөл хангаж бүртгүүлэхэд OK",
+      "description": "Даалгавар 1: B231234567 оюутан CS201 үзсэн; CS313 нь CS201 урьдачтай. POST дээр яг хоёр pm.test: статус ба result (registrationID тоо эсэхийг хоёр дахь oracle дотор шалгана).",
+      "item": [
+        {
+          "name": "Setup — B231234567 идэвхтэй, CS201 үзсэн",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\",\n  \"coursesTaken\": [\n    \"CS201\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/students/B231234567"
+          },
+          "response": []
+        },
+        {
+          "name": "Setup — CS313 урьдач CS201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prerequisites\": [\n    \"CS201\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/courses/CS313"
+          },
+          "response": []
+        },
+        {
+          "name": "Бүртгүүлэх — HTTP 201 ба result OK",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"ЗОРИУДЫН FAIL — HTTP 200 хүлээх\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "  pm.expect(pm.response.json().registrationID).to.be.a(\"number\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentID\": \"B231234567\",\n  \"courseID\": \"CS313\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/registrations"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "S02 — Оюутан байхгүй үед ERROR_NO_STUDENT",
+      "description": "README.md-ийн S02 спецификаци. Өөрийн setup-тай бие даасан тест.",
+      "item": [
+        {
+          "name": "Setup — C02_TARGET: prerequisites=[\"CS201\"]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prerequisites\": [\n    \"CS201\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/courses/C02_TARGET"
+          },
+          "response": []
+        },
+        {
+          "name": "Бүртгүүлэх — Оюутан байхгүй үед ERROR_NO_STUDENT",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.variables.set(\"missingStudentS02\", \"S02_MISSING_\" + pm.variables.replaceIn(\"{{$guid}}\"));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = ERROR_NO_STUDENT\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"ERROR_NO_STUDENT\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentID\": \"{{missingStudentS02}}\",\n  \"courseID\": \"C02_TARGET\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/registrations"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "S03 — Идэвхгүй оюутан бүртгүүлэхэд ERROR_INACTIVE_STUDENT",
+      "description": "README.md-ийн S03 спецификаци. Өөрийн setup-тай бие даасан тест.",
+      "item": [
+        {
+          "name": "Setup — S03_INACTIVE: inactive, coursesTaken=[\"CS201\"]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"inactive\",\n  \"coursesTaken\": [\n    \"CS201\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/students/S03_INACTIVE"
+          },
+          "response": []
+        },
+        {
+          "name": "Setup — C03_TARGET: prerequisites=[\"CS201\"]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prerequisites\": [\n    \"CS201\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/courses/C03_TARGET"
+          },
+          "response": []
+        },
+        {
+          "name": "Бүртгүүлэх — Идэвхгүй оюутан бүртгүүлэхэд ERROR_INACTIVE_STUDENT",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = ERROR_INACTIVE_STUDENT\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"ERROR_INACTIVE_STUDENT\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentID\": \"S03_INACTIVE\",\n  \"courseID\": \"C03_TARGET\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/registrations"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "S04 — Хичээл байхгүй үед ERROR_NO_COURSE",
+      "description": "README.md-ийн S04 спецификаци. Өөрийн setup-тай бие даасан тест.",
+      "item": [
+        {
+          "name": "Setup — S04_ACTIVE: active, coursesTaken=[\"CS201\"]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\",\n  \"coursesTaken\": [\n    \"CS201\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/students/S04_ACTIVE"
+          },
+          "response": []
+        },
+        {
+          "name": "Бүртгүүлэх — Хичээл байхгүй үед ERROR_NO_COURSE",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.variables.set(\"missingCourseS04\", \"S04_MISSING_\" + pm.variables.replaceIn(\"{{$guid}}\"));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = ERROR_NO_COURSE\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"ERROR_NO_COURSE\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentID\": \"S04_ACTIVE\",\n  \"courseID\": \"{{missingCourseS04}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/registrations"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "S05 — Урьдачийг огт үзээгүй үед ERROR_PREREQUISITES",
+      "description": "README.md-ийн S05 спецификаци. Өөрийн setup-тай бие даасан тест.",
+      "item": [
+        {
+          "name": "Setup — S05_ACTIVE: active, coursesTaken=[\"CS101\"]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\",\n  \"coursesTaken\": [\n    \"CS101\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/students/S05_ACTIVE"
+          },
+          "response": []
+        },
+        {
+          "name": "Setup — C05_TARGET: prerequisites=[\"CS201\",\"CS202\"]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prerequisites\": [\n    \"CS201\",\n    \"CS202\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/courses/C05_TARGET"
+          },
+          "response": []
+        },
+        {
+          "name": "Бүртгүүлэх — Урьдачийг огт үзээгүй үед ERROR_PREREQUISITES",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = ERROR_PREREQUISITES\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"ERROR_PREREQUISITES\");",
+                  "});",
+                  "pm.test(\"missing массив зөв\", function () {",
+                  "  pm.expect(pm.response.json().missing).to.eql([\"CS201\",\"CS202\"]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentID\": \"S05_ACTIVE\",\n  \"courseID\": \"C05_TARGET\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/registrations"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "S06 — Оюутан ба хичээл хоёулаа байхгүй үед ERROR_NO_STUDENT түрүүлнэ",
+      "description": "README.md-ийн S06 спецификаци. Өөрийн setup-тай бие даасан тест.",
+      "item": [
+        {
+          "name": "Setup — S06_CONTROL: active, coursesTaken=[]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\",\n  \"coursesTaken\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/students/S06_CONTROL"
+          },
+          "response": []
+        },
+        {
+          "name": "Setup — C06_CONTROL: prerequisites=[]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prerequisites\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/courses/C06_CONTROL"
+          },
+          "response": []
+        },
+        {
+          "name": "Бүртгүүлэх — Оюутан ба хичээл хоёулаа байхгүй үед ERROR_NO_STUDENT түрүүлнэ",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.variables.set(\"missingStudentS06\", \"S06_MISSING_\" + pm.variables.replaceIn(\"{{$guid}}\"));",
+                  "pm.variables.set(\"missingCourseS06\", \"S06_MISSING_\" + pm.variables.replaceIn(\"{{$guid}}\"));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = ERROR_NO_STUDENT\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"ERROR_NO_STUDENT\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentID\": \"{{missingStudentS06}}\",\n  \"courseID\": \"{{missingCourseS06}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/registrations"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "S07 — Идэвхгүй оюутан ба байхгүй хичээлд ERROR_INACTIVE_STUDENT түрүүлнэ",
+      "description": "README.md-ийн S07 спецификаци. Өөрийн setup-тай бие даасан тест.",
+      "item": [
+        {
+          "name": "Setup — S07_INACTIVE: inactive, coursesTaken=[]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"inactive\",\n  \"coursesTaken\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/students/S07_INACTIVE"
+          },
+          "response": []
+        },
+        {
+          "name": "Бүртгүүлэх — Идэвхгүй оюутан ба байхгүй хичээлд ERROR_INACTIVE_STUDENT түрүүлнэ",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.variables.set(\"missingCourseS07\", \"S07_MISSING_\" + pm.variables.replaceIn(\"{{$guid}}\"));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = ERROR_INACTIVE_STUDENT\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"ERROR_INACTIVE_STUDENT\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentID\": \"S07_INACTIVE\",\n  \"courseID\": \"{{missingCourseS07}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/registrations"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "S08 — Урьдачгүй хичээлд хоосон coursesTaken-тай оюутан OK",
+      "description": "README.md-ийн S08 спецификаци. Өөрийн setup-тай бие даасан тест.",
+      "item": [
+        {
+          "name": "Setup — S08_ACTIVE: active, coursesTaken=[]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\",\n  \"coursesTaken\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/students/S08_ACTIVE"
+          },
+          "response": []
+        },
+        {
+          "name": "Setup — C08_TARGET: prerequisites=[]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prerequisites\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/courses/C08_TARGET"
+          },
+          "response": []
+        },
+        {
+          "name": "Бүртгүүлэх — Урьдачгүй хичээлд хоосон coursesTaken-тай оюутан OK",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "  pm.expect(pm.response.json().registrationID).to.be.a(\"number\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentID\": \"S08_ACTIVE\",\n  \"courseID\": \"C08_TARGET\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/registrations"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "S09 — Урьдачтай хичээлд coursesTaken хоосон бол ERROR_PREREQUISITES",
+      "description": "README.md-ийн S09 спецификаци. Өөрийн setup-тай бие даасан тест.",
+      "item": [
+        {
+          "name": "Setup — S09_ACTIVE: active, coursesTaken=[]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\",\n  \"coursesTaken\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/students/S09_ACTIVE"
+          },
+          "response": []
+        },
+        {
+          "name": "Setup — C09_TARGET: prerequisites=[\"CS201\"]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prerequisites\": [\n    \"CS201\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/courses/C09_TARGET"
+          },
+          "response": []
+        },
+        {
+          "name": "Бүртгүүлэх — Урьдачтай хичээлд coursesTaken хоосон бол ERROR_PREREQUISITES",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = ERROR_PREREQUISITES\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"ERROR_PREREQUISITES\");",
+                  "});",
+                  "pm.test(\"missing массив зөв\", function () {",
+                  "  pm.expect(pm.response.json().missing).to.eql([\"CS201\"]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentID\": \"S09_ACTIVE\",\n  \"courseID\": \"C09_TARGET\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/registrations"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "S10 — Урьдачийн заримыг үзсэн бол зөвхөн CS202 дутна",
+      "description": "README.md-ийн S10 спецификаци. Өөрийн setup-тай бие даасан тест.",
+      "item": [
+        {
+          "name": "Setup — S10_ACTIVE: active, coursesTaken=[\"CS201\"]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\",\n  \"coursesTaken\": [\n    \"CS201\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/students/S10_ACTIVE"
+          },
+          "response": []
+        },
+        {
+          "name": "Setup — C10_TARGET: prerequisites=[\"CS201\",\"CS202\"]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prerequisites\": [\n    \"CS201\",\n    \"CS202\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/courses/C10_TARGET"
+          },
+          "response": []
+        },
+        {
+          "name": "Бүртгүүлэх — Урьдачийн заримыг үзсэн бол зөвхөн CS202 дутна",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = ERROR_PREREQUISITES\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"ERROR_PREREQUISITES\");",
+                  "});",
+                  "pm.test(\"missing массив зөв\", function () {",
+                  "  pm.expect(pm.response.json().missing).to.eql([\"CS202\"]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentID\": \"S10_ACTIVE\",\n  \"courseID\": \"C10_TARGET\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/registrations"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "S11 — studentID талбар дутуу үед ERROR_BAD_REQUEST",
+      "description": "README.md-ийн S11 спецификаци. Өөрийн setup-тай бие даасан тест.",
+      "item": [
+        {
+          "name": "Setup — S11_ACTIVE: active, coursesTaken=[\"CS201\"]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\",\n  \"coursesTaken\": [\n    \"CS201\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/students/S11_ACTIVE"
+          },
+          "response": []
+        },
+        {
+          "name": "Setup — C11_TARGET: prerequisites=[\"CS201\"]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prerequisites\": [\n    \"CS201\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/courses/C11_TARGET"
+          },
+          "response": []
+        },
+        {
+          "name": "Бүртгүүлэх — studentID талбар дутуу үед ERROR_BAD_REQUEST",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"result = ERROR_BAD_REQUEST\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"ERROR_BAD_REQUEST\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseID\": \"C11_TARGET\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/registrations"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "S12 — courseID талбар дутуу үед ERROR_BAD_REQUEST",
+      "description": "README.md-ийн S12 спецификаци. Өөрийн setup-тай бие даасан тест.",
+      "item": [
+        {
+          "name": "Setup — S12_ACTIVE: active, coursesTaken=[\"CS201\"]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\",\n  \"coursesTaken\": [\n    \"CS201\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/students/S12_ACTIVE"
+          },
+          "response": []
+        },
+        {
+          "name": "Setup — C12_TARGET: prerequisites=[\"CS201\"]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prerequisites\": [\n    \"CS201\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/courses/C12_TARGET"
+          },
+          "response": []
+        },
+        {
+          "name": "Бүртгүүлэх — courseID талбар дутуу үед ERROR_BAD_REQUEST",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"result = ERROR_BAD_REQUEST\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"ERROR_BAD_REQUEST\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentID\": \"S12_ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/registrations"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "S13 — JSON буруу үед ERROR_BAD_JSON",
+      "description": "README.md-ийн S13 спецификаци. Өөрийн setup-тай бие даасан тест.",
+      "item": [
+        {
+          "name": "Setup — S13_ACTIVE: active, coursesTaken=[\"CS201\"]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\",\n  \"coursesTaken\": [\n    \"CS201\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/students/S13_ACTIVE"
+          },
+          "response": []
+        },
+        {
+          "name": "Setup — C13_TARGET: prerequisites=[\"CS201\"]",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"result = OK\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"OK\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prerequisites\": [\n    \"CS201\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/courses/C13_TARGET"
+          },
+          "response": []
+        },
+        {
+          "name": "Бүртгүүлэх — JSON буруу үед ERROR_BAD_JSON",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 400\", function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"result = ERROR_BAD_JSON\", function () {",
+                  "  pm.expect(pm.response.json().result).to.eql(\"ERROR_BAD_JSON\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"studentID\":\"S13_ACTIVE\",\"courseID\":\"C13_TARGET\"",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/registrations"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
