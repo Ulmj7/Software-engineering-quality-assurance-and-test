@@ -1,0 +1,8 @@
+.DS_Store
+.idea/
+node_modules/
+*.docx
+*.dotx
+.ast-graph/
+.tools/
+

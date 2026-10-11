@@ -1,0 +1,13 @@
+{
+  "name": "lab05-api-system-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "F.CSA313 Lab 5: independent Postman API system tests with Newman",
+  "scripts": {
+    "start": "node server.js",
+    "test": "newman run lab05-collection.json --color off"
+  },
+  "devDependencies": {
+    "newman": "6.2.3"
+  }
+}
