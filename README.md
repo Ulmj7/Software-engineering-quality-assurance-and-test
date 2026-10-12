@@ -131,3 +131,45 @@ Usage: pict model [options]
 | [ERROR]/[SINGLE] нэг удаа | ердийн утгуудын хослол 1·1·1·2·2 = 4; [ERROR] утга 8 (Frozen, Missing, To-Missing, SameAsFrom, Zero, BelowZero, OverBalance, OverLimit) тус бүр 1; [SINGLE] 1 | 4 + 8 + 1 = **13** |
 
 **216 → 107 → 13.** Бүрэн олонлогийн 216 хослолоос зөвхөн 13 тест frame үлдэнэ.
+
+### A3: Спецификацийн хүснэгт
+
+17 мөр: A2-ын 13 тест frame (T01–T13) ба 4 давхар нөхцөл (T14–T17). Багана бүр нэг сонголт, сүүлийн багана нь хүлээгдэх үр дүн. Амжилт нь `201 {"result":"OK"}`, оролтын алдаа нь `200 {"result":"ERROR_..."}`.
+
+| ID | Төрөл | From | To | Amount | Currency | DailyUsed | Хүлээгдэх үр дүн |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| T01 | Happy path | Valid | Valid | Normal | Same | Empty | 201 `OK` |
+| T02 | Happy path | Valid | Valid | Normal | Different | Empty | 201 `OK` |
+| T03 | Happy path | Valid | Valid | Normal | Same | Partly | 201 `OK` |
+| T04 | Happy path | Valid | Valid | Normal | Different | Partly | 201 `OK` |
+| T05 | ERROR | **Frozen** | Valid | Normal | Same | Empty | 200 `ERROR_FROZEN` |
+| T06 | ERROR | **Missing** | Valid | Normal | Same | Empty | 200 `ERROR_NO_FROM` |
+| T07 | ERROR | Valid | **Missing** | Normal | Same | Empty | 200 `ERROR_NO_TO` |
+| T08 | ERROR | Valid | **SameAsFrom** | Normal | Same | Empty | 200 `ERROR_SAME_ACCOUNT` |
+| T09 | ERROR | Valid | Valid | **Zero** | Same | Empty | 200 `ERROR_BAD_AMOUNT` |
+| T10 | ERROR | Valid | Valid | **BelowZero** | Same | Empty | 200 `ERROR_BAD_AMOUNT` |
+| T11 | ERROR | Valid | Valid | **OverBalance** | Same | Empty | 200 `ERROR_INSUFFICIENT` |
+| T12 | ERROR | Valid | Valid | **OverLimit** | Same | Empty | 200 `ERROR_LIMIT` |
+| T13 | SINGLE | Valid | Valid | **ExactBalance** | Same | Empty | 201 `OK` |
+| T14 | Давхар | Frozen | SameAsFrom | Normal | Same | Empty | 200 `ERROR_FROZEN` |
+| T15 | Давхар | Valid | Missing | Zero | Same | Empty | 200 `ERROR_NO_TO` |
+| T16 | Давхар | Valid | Valid | OverBalance + OverLimit | Same | Empty | 200 `ERROR_INSUFFICIENT` |
+| T17 | Давхар | Missing | Valid | Zero | Same | Empty | 200 `ERROR_NO_FROM` |
+
+Тодорхойлолтын шаардлагыг хангасан байдал:
+
+| Шаардлага | Хангасан мөр |
+| --- | --- |
+| Happy path | T01–T04 |
+| Алдааны анги бүр (7) | NO_FROM T06, FROZEN T05, NO_TO T07, SAME_ACCOUNT T08, BAD_AMOUNT T09/T10, INSUFFICIENT T11, LIMIT T12 |
+| Дор хаяж нэг SINGLE | T13 |
+| Сонирхолтой давхар нөхцөл | T14–T17 |
+
+**Давхар нөхцөлийн мөрүүд.** Хүлээгдэх үр дүнг дээрх давуу эрэмбээр гаргасан. Тодорхойлолт үүнийг шууд заагаагүй.
+
+- **T14:** царцаагдсан данс, мөн `to` нь `from`-той ижил. FROZEN нь SAME_ACCOUNT-аас түрүүлнэ (from → to).
+- **T15:** `to` байхгүй, мөн дүн 0. NO_TO нь BAD_AMOUNT-аас түрүүлнэ (to → amount).
+- **T16:** `a` нь үлдэгдлээс ч, үлдсэн лимитээс ч их (`ACC-100`, 2,000,000 MNT). INSUFFICIENT нь LIMIT-ээс түрүүлнэ.
+- **T17:** `from` байхгүй, мөн дүн 0. NO_FROM нь BAD_AMOUNT-аас түрүүлнэ. Хэрэгжилт дүнгийн шалгалтыг эхэлж хийдэг бол энэ мөр унана, тиймээс давхар мөрүүдээс хамгийн эрсдэлтэй нь юм.
+
+**Тэмдэглэл.** T11, T13 нь `ACC-POOR`, бусад нь `ACC-100` дээр суурилна (A1-ийн fixture). K1, K2 нь T15, T17-г PICT-ийн гаралтаас хасдаг (B2), тиймээс эдгээр давхар мөрийг A3-д гараар хадгалав.
