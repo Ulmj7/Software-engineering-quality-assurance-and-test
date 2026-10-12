@@ -1,0 +1,12 @@
+# POST /transfer with the [IF] constraints K1, K2 from README section A2.
+# Error values are still plain values here, so error masking is possible.
+From:      Valid, Frozen, Missing
+To:        Valid, Missing, SameAsFrom
+Amount:    Normal, Zero, BelowZero, OverBalance, OverLimit
+Currency:  Same, Different
+DailyUsed: Empty, Partly
+
+# K1: a missing from-account has no balance, limit or currency (N/A), fix defaults.
+IF [From] = "Missing" THEN [Amount] = "Normal" AND [Currency] = "Same" AND [DailyUsed] = "Empty";
+# K2: NO_TO is reported before any amount error (precedence), so keep Amount neutral.
+IF [To] = "Missing" THEN [Amount] = "Normal";

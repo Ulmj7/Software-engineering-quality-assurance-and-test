@@ -208,3 +208,104 @@ tail -n +2 results/browser-3way.txt | wc -l   # 20
 **3-way: 20 мөр.** Гурвалсан хослол бүр (248 ширхэг) хамрагдах тул 2-way-ээс 2 дахин олон мөр хэрэгтэй боловч бүрэн олонлог 144-ийн 13.9% л байна. Доод хязгаар нь хамгийн том гурван домэйны үржвэр 3 · 3 · 2 = 18, PICT-ийн 20 нь түүнд ойр байна.
 
 Хос ба гурвалсан хослолын хамралтыг PICT-ийн гаралт дээр бие даан шалгасан (хамрагдаагүй хос 0, хамрагдаагүй гурвалсан 0).
+
+### B2: Шилжүүлгийн моделиа PICT-ээр
+
+A1-ийн утгуудыг PICT хэл рүү буулгав. `ExactBalance` ([SINGLE]) нь PICT-д орохгүй (A2), тиймээс 5 параметрийн бүрэн олонлог 3 · 3 · 5 · 2 · 2 = **180**. Гурван model:
+
+**[transfer-nc.model](transfer-nc.model)** — хязгаарлалтгүй, алдааны утга нь энгийн утга:
+
+```text
+From:      Valid, Frozen, Missing
+To:        Valid, Missing, SameAsFrom
+Amount:    Normal, Zero, BelowZero, OverBalance, OverLimit
+Currency:  Same, Different
+DailyUsed: Empty, Partly
+```
+
+**[transfer.model](transfer.model)** — дээрхтэй ижил параметр, дээр нь A2-ын K1, K2:
+
+```text
+IF [From] = "Missing" THEN [Amount] = "Normal" AND [Currency] = "Same" AND [DailyUsed] = "Empty";
+IF [To] = "Missing" THEN [Amount] = "Normal";
+```
+
+**[transfer-neg.model](transfer-neg.model)** — [ERROR] утгууд `~`-тэй, A2-оос зөвхөн N/A хязгаарлалт үлдсэн (шалтгааныг доор тайлбарлав):
+
+```text
+From:      Valid, ~Frozen, ~Missing
+To:        Valid, ~Missing, ~SameAsFrom
+Amount:    Normal, ~Zero, ~BelowZero, ~OverBalance, ~OverLimit
+Currency:  Same, Different
+DailyUsed: Empty, Partly
+
+IF [From] = "Missing" THEN [Currency] = "Same" AND [DailyUsed] = "Empty";
+```
+
+```bash
+pict transfer-nc.model  > results/transfer-nc.txt
+pict transfer.model     > results/transfer.txt
+pict transfer-neg.model > results/transfer-neg.txt
+tail -n +2 results/transfer-nc.txt  | wc -l   # 16
+tail -n +2 results/transfer.txt     | wc -l   # 14
+tail -n +2 results/transfer-neg.txt | wc -l   # 20
+```
+
+**Гурван хувилбарын харьцуулалт.** Мөр дэх «алдаа» нь `From≠Valid`, `To≠Valid`, `Amount≠Normal` гурвын тоо (`~Frozen` ≠ `Valid` тул `~` нь тооцоонд саад болохгүй). Happy path нь 0 алдаатай мөр. «Тусдаа шалгагдсан» нь 8 error утгаас яг 1 алдаатай мөрөнд, өөр алдаагүйгээр орсон утгын тоо.
+
+| Хувилбар | Гаралт | Мөр | Happy path | 1 алдаатай | 2 алдаатай | 3 алдаатай | Тусдаа шалгагдсан error утга (8-аас) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `transfer-nc` | [results/transfer-nc.txt](results/transfer-nc.txt) | **16** | 0 | 4 | 6 | 6 | 4 |
+| `transfer` | [results/transfer.txt](results/transfer.txt) | **14** | 0 | 4 | 8 | 2 | 4 |
+| `transfer-neg` | [results/transfer-neg.txt](results/transfer-neg.txt) | **20** | 4 | 16 | 0 | 0 | 8 |
+
+Хүснэгтийн тоог дараах командаар гаргасан (мөрийн тоо нь дээрх `wc -l`-тэй таарна):
+
+```bash
+for m in transfer-nc transfer transfer-neg; do
+  rows=$(tail -n +2 results/$m.txt | wc -l)
+  awk -F'\t' -v m=$m -v rows=$rows 'NR>1 {e=($1!="Valid")+($2!="Valid")+($3!="Normal"); n[e]++}
+    END {printf "%-12s rows=%d happy=%d err1=%d err2=%d err3=%d\n", m, rows, n[0], n[1], n[2], n[3]}' results/$m.txt
+done
+```
+
+```text
+transfer-nc  rows=16 happy=0 err1=4 err2=6 err3=6
+transfer     rows=14 happy=0 err1=4 err2=8 err3=2
+transfer-neg rows=20 happy=4 err1=16 err2=0 err3=0
+```
+
+**Гаралтыг уншсан дүгнэлт** (мөрийн дугаар нь толгойг оролцуулсан файлын мөрийн дугаар):
+
+1. **Happy path мөр гарсангүй.** `transfer-nc`, `transfer`-д (`Valid`, `Valid`, `Normal`) гурвал нэг ч мөрөнд тохиолдоогүй, гэтэл бүх боломжит хос хамрагдсан. Pairwise нь «бүх утга хүчинтэй» мөрийг баталгаажуулдаггүй тул happy path-ийг тусад нь нэмэх хэрэгтэй. `transfer-neg`-д эерэг утгуудаас бүрдсэн 4 мөр (Currency × DailyUsed) автоматаар гарч, бүгд happy path.
+2. **Нэг мөрөнд олон алдаа орсон.** `transfer-nc`-д 16 мөрийн 12, `transfer`-д 14 мөрийн 10 нь 2 ба түүнээс олон алдаатай, дээд тал нь 3. K1, K2 нь зөвхөн `Missing`-тэй холбоотой хослолыг хасдаг тул `Frozen`, `SameAsFrom` ба дүнгийн алдаа харилцан хосолсон мөр үлдсэн (A2-д зориуд ингэсэн). `transfer-neg`-д 16 алдаатай мөр бүгд яг 1 алдаатай.
+3. **Олон алдаатай мөр юуг шалгаж байгаа нь тодорхойгүй.** Ийм мөрийн хүлээгдэх үр дүн нь давуу эрэмбээр хамгийн түрүүлэх нэг алдаа, бусад нь далдлагдана (error masking). Жишээ нь `Frozen SameAsFrom Zero` мөр зөвхөн FROZEN-ийг шалгаж, SAME_ACCOUNT ба BAD_AMOUNT-ийн талаар юу ч хэлэхгүй. Түүний oracle нь мөн тодорхойлолтод байхгүй, миний тогтоосон давуу эрэмбээс хамаарна.
+4. **Зарим алдаа тусдаа шалгагдаагүй.** 1 алдаатай мөрүүдийг `awk -F'\t' 'NR>1 && (($1!="Valid")+($2!="Valid")+($3!="Normal"))==1 {print $1, $2, $3}' results/<файл>.txt` командаар гаргавал:
+   - `transfer.txt`: `Missing Valid Normal`, `Valid Valid Zero`, `Valid Valid OverLimit`, `Valid Missing Normal`. Өөрөөр хэлбэл `Frozen`, `SameAsFrom`, `BelowZero`, `OverBalance` зөвхөн өөр алдааны ард орсон тул ERROR_FROZEN, ERROR_SAME_ACCOUNT, ERROR_INSUFFICIENT-ийг цэвэр хэлбэрээр шалгах мөр байхгүй.
+   - `transfer-nc.txt`: `Valid Valid Zero`, `Valid Valid OverBalance`, `Frozen Valid Normal`, `Valid Missing Normal`. Энд `Missing` (from), `SameAsFrom`, `BelowZero`, `OverLimit` тусдаа мөргүй.
+   - `transfer-neg.txt`: 8 error утга бүгд дор хаяж 1 тусдаа мөртэй.
+5. **Greedy `transfer-neg`-д ч харагдана.** `~Zero` 3 мөр (8, 9, 21-р мөр) авсан боловч Currency × DailyUsed-ийг хамрахад 2 мөр хангалттай. 16 алдаатай мөрийн задаргаа: `~Missing` (from) 1, `~Zero` 3, бусад 6 утга тус бүр 2.
+6. **Мөрийн тоо.** 16 → 14: K1, K2 нь утгагүй хослолыг хасч 2 мөр хэмнэв. 14 → 20: `~` нь 6 мөр нэмсэн, учир нь error утга бүр Currency × DailyUsed-ийн хоёр утгатай тусад нь хосолж шалгагдах ёстой болсон. Нэмэгдсэн мөр бүр нэг тодорхой алдааг шалгана.
+
+**`~` хэрэглэхэд A2-ын хязгаарлалт хэрэгтэй хэвээр үлдсэн үү?** Хэсэгчлэн.
+
+| A2-ын хязгаарлалт | `~`-тэй үед | Тайлбар |
+| --- | --- | --- |
+| K2: `To=Missing → Amount=Normal` | Хэрэггүй, хасав | Хоёр `~` утга нэг мөрөнд орохгүй тул NO_TO нь дүнгийн алдаатай холилдож чадахгүй. |
+| K1: `From=Missing → Amount=Normal` хэсэг | Хэрэггүй, хасав | Amount-ийн цорын ганц эерэг утга нь `Normal` тул мөрөнд өөр дүн орох боломжгүй. |
+| K1: `Currency=Same`, `DailyUsed=Empty` хэсэг (N/A) | **Хэрэгтэй хэвээр, үлдсэн** | `~` нь сөрөг утгуудыг бие биенээс тусгаарладаг, харин сөрөг утгыг утгагүй эерэг утгатай хослуулахаас сэргийлдэггүй. |
+
+Сүүлийн мөрийг баталгаажуулахын тулд `transfer-neg.model`-ийн `IF` мөрийг түр хасч ажиллуулахад `~Missing Valid Normal Different Partly` мөр гарсан: данс байхгүй мөртөө «өөр валют, лимит хэсэгчлэн ашигласан» гэсэн утгагүй мөр. Дүгнэлт: [ERROR]-ийг тусгаарлах хязгаарлалт (K2, K1-ийн Amount хэсэг) `~`-ээр бүрэн орлогдсон, харин [IF] (N/A) төрлийн хязгаарлалт `~`-тэй үед ч хэвээр хэрэгтэй.
+
+**Бодит тест кейс.** Гаралтын 5 мөрийг Лаб 5-ын хэв маягаар (setup + оролт + oracle) тест кейс болгов. Fixture нь A-ийн таамаглалын 3-р зүйл (ханш 1 USD = 3000 MNT, «өнөөдөр 300,000 шилжүүлсэн» нь өмнөх амжилттай шилжүүлгээр бэлдэгдэнэ).
+
+| ID | PICT мөр | Setup | Оролт (`POST /transfer`) | Oracle |
+| --- | --- | --- | --- | --- |
+| TC1 happy path | `transfer-neg.txt` 5-р мөр: `Valid Valid Normal Different Partly` | `ACC-100` (MNT, үлдэгдэл 1,000,000, лимит 500,000), өнөөдөр 300,000 шилжүүлсэн (R = 200,000); `ACC-200` байгаа | `{"from":"ACC-100","to":"ACC-200","amount":50,"currency":"USD"}` (a = 150,000) | HTTP 201, `{"result":"OK"}` |
+| TC2 нэг алдаа | `transfer-neg.txt` 6-р мөр: `Valid Valid ~OverLimit Different Empty` | `ACC-100`, өнөөдөр 0 шилжүүлсэн (R = 500,000); `ACC-200` | `{"from":"ACC-100","to":"ACC-200","amount":200,"currency":"USD"}` (a = 600,000) | HTTP 200, `{"result":"ERROR_LIMIT"}` |
+| TC3 нэг алдаа | `transfer-neg.txt` 13-р мөр: `Valid Valid ~OverBalance Same Partly` | `ACC-POOR` (MNT, үлдэгдэл 100,000, лимит 500,000), өнөөдөр 300,000 шилжүүлсэн (R = 200,000); `ACC-200` | `{"from":"ACC-POOR","to":"ACC-200","amount":150000,"currency":"MNT"}` (B < a ≤ R) | HTTP 200, `{"result":"ERROR_INSUFFICIENT"}` |
+| TC4 нэг алдаа | `transfer-neg.txt` 14-р мөр: `~Frozen Valid Normal Same Empty` | `ACC-FRZ` (царцаагдсан, MNT, үлдэгдэл 1,000,000, лимит 500,000), өнөөдөр 0; `ACC-200` | `{"from":"ACC-FRZ","to":"ACC-200","amount":150000,"currency":"MNT"}` | HTTP 200, `{"result":"ERROR_FROZEN"}` |
+| TC5 олон алдаа | `transfer.txt` 10-р мөр: `Frozen SameAsFrom Zero Same Empty` | `ACC-FRZ` (царцаагдсан, MNT, үлдэгдэл 1,000,000, лимит 500,000), өнөөдөр 0 | `{"from":"ACC-FRZ","to":"ACC-FRZ","amount":0,"currency":"MNT"}` | HTTP 200, `{"result":"ERROR_FROZEN"}` |
+
+- **TC1** нь happy path, **TC2–TC4** нь `transfer-neg`-ийн нэг алдаатай мөр. TC2-т түүхий `200` нь лимит 500,000-аас бага, харин хөрвүүлсний дараа 600,000 болж лимитээс хэтэрнэ, тиймээс хөрвүүлэлтгүйгээр харьцуулдаг хэрэгжилт энд унана. TC3-ын `ACC-POOR` нь `a > B` атлаа `a ≤ R` байлгаж INSUFFICIENT-ийг LIMIT-ээс тусгаарлана. TC4 нь `transfer.txt`-д тусдаа мөргүй FROZEN-ийг цэвэр шалгана.
+- **TC5** нь олон алдаатай мөр. Алдаа гурав (FROZEN, SAME_ACCOUNT, BAD_AMOUNT) байх бөгөөд давуу эрэмбээр `NO_FROM → FROZEN → NO_TO → SAME_ACCOUNT → BAD_AMOUNT → ...` тул эхнийх нь ERROR_FROZEN. Хэрэгжилт дүнгийн шалгалтыг эхэлж хийдэг бол TC5 унана. Энэ нь шууд согог гэсэн үг биш, тодорхойлолтыг тодруулах шаардлагатай давуу эрэмбийн таамаглалын зөрүү юм.

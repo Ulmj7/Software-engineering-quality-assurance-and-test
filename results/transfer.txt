@@ -1,0 +1,15 @@
+From	To	Amount	Currency	DailyUsed
+Valid	SameAsFrom	OverBalance	Same	Empty
+Frozen	Valid	BelowZero	Same	Partly
+Valid	SameAsFrom	Zero	Different	Partly
+Frozen	Missing	Normal	Different	Empty
+Missing	Valid	Normal	Same	Empty
+Valid	Valid	Zero	Same	Empty
+Valid	Valid	OverLimit	Same	Partly
+Valid	Missing	Normal	Different	Partly
+Frozen	SameAsFrom	Zero	Same	Empty
+Missing	SameAsFrom	Normal	Same	Empty
+Valid	SameAsFrom	BelowZero	Different	Empty
+Frozen	Valid	OverBalance	Different	Partly
+Missing	Missing	Normal	Same	Empty
+Frozen	SameAsFrom	OverLimit	Different	Empty

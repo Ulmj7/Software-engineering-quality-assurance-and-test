@@ -1,0 +1,7 @@
+# POST /transfer, no constraints: Part A choices written as plain PICT values.
+# ExactBalance ([SINGLE] in A2) is left out: PICT cannot express "exactly once".
+From:      Valid, Frozen, Missing
+To:        Valid, Missing, SameAsFrom
+Amount:    Normal, Zero, BelowZero, OverBalance, OverLimit
+Currency:  Same, Different
+DailyUsed: Empty, Partly

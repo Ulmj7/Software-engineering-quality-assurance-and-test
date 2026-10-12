@@ -1,0 +1,11 @@
+# POST /transfer, [ERROR] values marked with ~ (negative values):
+# PICT puts at most one negative value into a row.
+From:      Valid, ~Frozen, ~Missing
+To:        Valid, ~Missing, ~SameAsFrom
+Amount:    Normal, ~Zero, ~BelowZero, ~OverBalance, ~OverLimit
+Currency:  Same, Different
+DailyUsed: Empty, Partly
+
+# Only the N/A part of K1 remains: ~Missing must not be paired with Different/Partly,
+# because a missing from-account has no currency or daily limit state.
+IF [From] = "Missing" THEN [Currency] = "Same" AND [DailyUsed] = "Empty";
