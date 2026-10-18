@@ -1,0 +1,5 @@
+curl: (56) Recv failure: Connection was reset
+
+--- дараагийн хүсэлт: curl -i localhost:3000/api/books
+curl: (7) Failed to connect to localhost:3000 after 2244 ms: Could not connect to server
+
