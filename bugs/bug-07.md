@@ -27,6 +27,6 @@
 
 Ноцтой байдал: Major — спецификацийн шууд зөрчил; хүснэгтэд «NaN» гэх мэт утгагүй өгөгдөл гарч, API-ийн оны төрөл холилдсоноос өгөгдлийг боловсруулах бусад систем эвдэрнэ.
 
-Хавсралт: ![BUG-07](../screenshots/bug-07.png) · [evidence/bug-07-curl.txt](../evidence/bug-07-curl.txt)
+Хавсралт: ![BUG-07](../screenshots/bug-07.png) · [evidence/bug-07-curl.txt](../evidence/bug-07-curl.txt) · [evidence/bug-13-curl.txt](../evidence/bug-13-curl.txt) (харьцуулалт: API-д `year`-г тоогоор илгээвэл тоо хэвээр хадгалагдана — текст болох нь UI-аас нэмэхэд)
 
 Олдсон аялал: Couch Potato (оролтын хязгаарын утгууд); Fed-Ex-ээр (UI → API) он текст болж хадгалагдахыг баталгаажуулсан
