@@ -1,8 +1,26 @@
-HTTP/1.1 201 Created
-Content-Type: application/json
-Date: Sun, 18 Oct 2026 12:53:39 GMT
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Date: Sun, 18 Oct 2026 13:09:15 GMT
 Connection: keep-alive
 Keep-Alive: timeout=5
 Transfer-Encoding: chunked
 
-{"result":"OK","id":4}
+[{"id":1,"title":"Тунгалаг Тамир","author":"Ч.Лодойдамба","year":1971},{"id":2,"title":"Clean Code","author":"Robert C. Martin","year":2008},{"id":3,"title":"The Pragmatic Programmer","author":"D.Thomas & A.Hunt","year":1999},{"id":4,"title":"Typed","author":"Anon","year":"2004"}]
+
+HTTP/1.1 201 Created
+Content-Type: application/json
+Date: Sun, 18 Oct 2026 13:09:15 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+{"result":"OK","id":5}
+
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Date: Sun, 18 Oct 2026 13:09:15 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+[{"id":1,"title":"Тунгалаг Тамир","author":"Ч.Лодойдамба","year":1971},{"id":2,"title":"Clean Code","author":"Robert C. Martin","year":2008},{"id":3,"title":"The Pragmatic Programmer","author":"D.Thomas & A.Hunt","year":1999},{"id":4,"title":"Typed","author":"Anon","year":"2004"},{"id":5,"title":"Y","author":"Z","year":"abc"}]
