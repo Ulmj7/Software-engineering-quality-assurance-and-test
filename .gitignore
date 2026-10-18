@@ -1,0 +1,8 @@
+.DS_Store
+.idea/
+node_modules/
+*.docx
+.ast-graph/
+.playwright-cli/
+# багшийн файл (Teams -> Lab07); репод оруулаагүй
+app.js
