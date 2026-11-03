@@ -1,8 +1,8 @@
 # Lab 08: Mockito mock objects
 
-Student name: **Not provided**
+Student name: **Г. Үлэмж**
 
-Student code: **Not provided**
+Student code: **B232270805**
 
 This project tests `CourseRegistrationService` with JUnit 5 and Mockito. The repository root contains `pom.xml`, `src/main`, `src/test`, and `results`; run Maven from this directory. No database or email server is required.
 
@@ -33,8 +33,6 @@ With JDK 17 and Maven available on the path:
 ```sh
 mvn test
 ```
-
-The commits use the explicitly authorized repository-local author `Lab8 Automation <lab8-automation@example.invalid>`. This automation author is separate from the student name and code above.
 
 ## Part A: eight test requirements, ten executed cases
 
