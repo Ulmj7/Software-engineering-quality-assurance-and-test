@@ -1,0 +1,2 @@
+# Preserve the unedited k6 console output, including its own spacing.
+results/*.txt whitespace=-blank-at-eol,-blank-at-eof

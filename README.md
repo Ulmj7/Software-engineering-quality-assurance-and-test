@@ -6,6 +6,8 @@ Student code: **B232270805**
 
 This project tests `CourseRegistrationService` with JUnit 5 and Mockito. The repository root contains `pom.xml`, `src/main`, `src/test`, and `results`; run Maven from this directory. No database or email server is required.
 
+The previous k6 lab report is retained in [README-Lab02.md](README-Lab02.md).
+
 ## Environment
 
 The recorded runs used Eclipse Temurin JDK 17 and Apache Maven 3.9.16, unpacked outside the repository. The machine initially had Android Studio's JBR 25 on its path and no Maven executable; the outputs below are from the environment actually used for every saved test run. The compiler plugin is explicitly pinned to 3.13.0 so Java 17's `release` setting also works with Maven installations whose default compiler plugin is older.
